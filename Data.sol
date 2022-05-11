@@ -26,8 +26,10 @@ library Data {
     /// @dev `values` must be a standard array created with new bytes32[](len)
     function amend(bytes32[] memory values) internal returns (Amendment memory amendment) {
         assembly {
+            let len := mload(values)
             mstore(values, 0x000000000000000000000000000000000000000000600b803803903d39593df3)
-            mstore(amendment, create(0, add(values, 21), add(mload(values), 11)))
+            mstore(amendment, create(0, add(values, 21), add(len, 11)))
+            mstore(values, len)
         }
     }
 }
