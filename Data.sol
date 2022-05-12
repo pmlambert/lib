@@ -16,14 +16,25 @@ library Data {
         }
     }
     /// @dev read from the amendment at `key` word index.
-    function read(uint16 key, Amendment memory amendment) internal view returns (bytes32 value) {
+    function read(Amendment memory amendment, uint16 key) internal view returns (bytes32 value) {
         assembly {
             extcodecopy(mload(amendment), 0, mul(key, 32), 32)
             value := mload(0)
         }
     }
+    /// @dev read a range of values.
+    function readRange(Amendment memory amendment, uint16 start, uint16 length) internal view returns (bytes32[] memory values) {
+        assembly {
+            let values := mload(0x40)
+            let len := mul(length, 32)
+            let data := add(values, 1)
+            extcodecopy(mload(amendment), data, mul(start, 32), len)
+            mstore(0x40, add(data, len))
+        }
+    }
     /// @dev create a new amendment.
-    /// @dev `values` must be a standard array created with new bytes32[](len)
+    /// @dev `values` must be a standard array created with new bytes32[](len).
+    /// @dev recommended to replace the `init` return value with this one.
     function amend(bytes32[] memory values) internal returns (Amendment memory amendment) {
         bytes32 KEY = AMENDMENT_KEY;
         assembly {
