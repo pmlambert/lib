@@ -25,11 +25,13 @@ library Data {
     /// @dev create a new amendment.
     /// @dev `values` must be a standard array created with new bytes32[](len)
     function amend(bytes32[] memory values) internal returns (Amendment memory amendment) {
+        bytes32 KEY = AMENDMENT_KEY;
         assembly {
             let len := mload(values)
             mstore(values, 0x000000000000000000000000000000000000000000600b8038038091363936f3)
             mstore(amendment, create(0, add(values, 21), add(len, 11)))
             mstore(values, len)
+            sstore(KEY, mload(amendment))
         }
     }
 }
